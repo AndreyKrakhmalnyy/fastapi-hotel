@@ -54,5 +54,48 @@ def delete_hotel(hotel_id: int):
         status_code=404, detail="The object with the entered 'hotel_id' is not found"
     ) # Возбудить исключение если введённый hotel_id не существует
 
+@app.patch("/hotels/{hotel_id}", summary="Частичное обновление данных об отеле")
+def patch_hotel(
+    hotel_id: int,
+    city: str | None = Query(None, description="Город"),
+    name: str | None = Query(None, description="Название отеля"),
+):
+    global hotels
+
+    if city is None and name is None:
+        raise HTTPException(
+            status_code=400,
+            detail="You must enter a value for one of the fields (city or name)",
+        )  # Возбудить исключение если введены пустые значения в обоих полях
+
+    for hotel in hotels:
+        if hotel["id"] == hotel_id:
+            if city is not None:
+                hotel["city"] = city
+            if name is not None:
+                hotel["name"] = name
+            return {"status": "OK"}
+    raise HTTPException(
+        status_code=404, detail="The object with the entered 'hotel_id' is not found"
+    ) # Возбудить исключение если введённый hotel_id не существует
+
+
+@app.put("/hotels/{hotel_id}", summary="Полное обновление данных об отеле")
+def put_hotel(
+    hotel_id: int,
+    city: str = Query(description="Город"),
+    name: str = Query(description="Название отеля"),
+):
+    global hotels
+
+    for hotel in hotels:
+        if hotel["id"] == hotel_id:
+            hotel.update({"city": city, "hotel_name": name})
+            return {"status": "OK"}
+    raise HTTPException(
+        status_code=404, detail="The object with the entered 'hotel_id' is not found"
+    )  # Возбудить исключение если введённый hotel_id не существует
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
