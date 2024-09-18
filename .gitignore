@@ -1,0 +1,7 @@
+# ide
+.pylintrc
+.vscode
+
+# project
+venv
+__pycache__
