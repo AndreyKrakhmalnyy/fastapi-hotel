@@ -54,15 +54,17 @@ def delete_hotel(hotel_id: int):
         status_code=404, detail="The object with the entered 'hotel_id' is not found"
     ) # Возбудить исключение если введённый hotel_id не существует
 
-@app.patch("/hotels/{hotel_id}", summary="Частичное обновление данных об отеле")
+@app.patch("/hotels/{hotel_id}", 
+        summary="Частичное обновление данных об отеле",
+        description='Принимает существующий id отеля и позволяет изменять данные только по нужным полям')
 def patch_hotel(
     hotel_id: int,
-    city: str | None = Query(None, description="Город"),
-    name: str | None = Query(None, description="Название отеля"),
+    city: str | None = Body(None, description="Город"),
+    name: str | None = Body(None, description="Название отеля"),
 ):
     global hotels
 
-    if city is None and name is None:
+    if city is None and name is None :
         raise HTTPException(
             status_code=400,
             detail="You must enter a value for one of the fields (city or name)",
@@ -80,11 +82,13 @@ def patch_hotel(
     ) # Возбудить исключение если введённый hotel_id не существует
 
 
-@app.put("/hotels/{hotel_id}", summary="Полное обновление данных об отеле")
+@app.put("/hotels/{hotel_id}", 
+        summary="Полное обновление данных об отеле",
+        description='Принимает существующий id отеля и обновляет данные только при изменения значений для всех полей')
 def put_hotel(
     hotel_id: int,
-    city: str = Query(description="Город"),
-    name: str = Query(description="Название отеля"),
+    city: str = Body(description="Город"),
+    name: str = Body(description="Название отеля"),
 ):
     global hotels
 
