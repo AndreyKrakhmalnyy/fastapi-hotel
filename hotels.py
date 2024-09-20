@@ -34,6 +34,10 @@ def get_hotel(
 
     if per_page and page:
         return hotels[(per_page * page) - per_page:per_page * page]
+    if not page and per_page:
+        return hotels[(per_page * 1) - per_page:per_page * 1]
+    if not per_page and page:
+        return hotels[(1 * page) - 1:1 * page]
     
     for hotel in hotels:
         if id and hotel["id"] != id:
