@@ -9,6 +9,12 @@ hotels = [
     {"id": 2, "city": "Dubai", "name": "Rove Dubai Marina"},
     {"id": 3, "city": "Moscow", "name": "Azimut"},
     {"id": 4, "city": "Gelendzhik", "name": "Приморье"},
+    {"id": 5, "city": "Paris", "name": "Hotel de Crillon"},
+    {"id": 6, "city": "Rome", "name": "Hotel de Russie"},
+    {"id": 7, "city": "London", "name": "The Ritz London"},
+    {"id": 8, "city": "New York", "name": "The Peninsula New York"},
+    {"id": 9, "city": "Tokyo", "name": "Imperial Hotel"},
+    {"id": 10, "city": "Sydney", "name": "Four Seasons Hotel Sydney"},
 ]
 
 
@@ -21,9 +27,14 @@ def get_hotel(
     id: int | None = Query(None, description="Уникальный id отеля"),
     city: str | None = Query(None, description="Город"),
     name: str | None = Query(None, description="Название отеля"),
+    per_page: int = Query(None, description="Число отелей на странице"),
+    page: int = Query(None, description="Номер страницы"),
 ):
     all_hotels = []
 
+    if per_page and page:
+        return hotels[(per_page * page) - per_page:per_page * page]
+    
     for hotel in hotels:
         if id and hotel["id"] != id:
             continue
