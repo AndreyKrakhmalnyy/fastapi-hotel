@@ -5,3 +5,6 @@
 # project
 venv
 __pycache__
+
+# venv variables
+.env
