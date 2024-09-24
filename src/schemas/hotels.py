@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 
-class Hotel(BaseModel):
+class HotelPutPost(BaseModel):
     city: str = Field(None, description="Город")
     name: str = Field(None, description="Название отеля")
     
