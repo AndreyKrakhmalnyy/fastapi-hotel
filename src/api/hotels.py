@@ -1,21 +1,25 @@
 from fastapi import APIRouter, HTTPException, Query, Body
+from models.hotels import HotelOrm
 from src.api.dependencies import PaginationDep
-from src.schemas.hotels import Hotel, HotelPatch
+from src.schemas.hotels import HotelPutPost, HotelPatch
+from src.database import async_session_maker
+from sqlalchemy import insert
+
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
 
 hotels = [
-    {"id": 1, "city": "Sochi", "name": "PULLMAN"},
-    {"id": 2, "city": "Dubai", "name": "Rove Dubai Marina"},
-    {"id": 3, "city": "Moscow", "name": "Azimut"},
-    {"id": 4, "city": "Gelendzhik", "name": "Приморье"},
-    {"id": 5, "city": "Paris", "name": "Hotel de Crillon"},
-    {"id": 6, "city": "Rome", "name": "Hotel de Russie"},
-    {"id": 7, "city": "London", "name": "The Ritz London"},
-    {"id": 8, "city": "New York", "name": "The Peninsula New York"},
-    {"id": 9, "city": "Tokyo", "name": "Imperial Hotel"},
-    {"id": 10, "city": "Sydney", "name": "Four Seasons Hotel Sydney"},
+    {"id": 1, "location": "Sochi", "title": "PULLMAN"},
+    {"id": 2, "location": "Dubai", "title": "Rove Dubai Marina"},
+    {"id": 3, "location": "Moscow", "title": "Azimut"},
+    {"id": 4, "location": "Gelendzhik", "title": "Приморье"},
+    {"id": 5, "location": "Paris", "title": "Hotel de Crillon"},
+    {"id": 6, "location": "Rome", "title": "Hotel de Russie"},
+    {"id": 7, "location": "London", "title": "The Ritz London"},
+    {"id": 8, "location": "New York", "title": "The Peninsula New York"},
+    {"id": 9, "location": "Tokyo", "title": "Imperial Hotel"},
+    {"id": 10, "location": "Sydney", "title": "Four Seasons Hotel Sydney"},
 ]
 
 
@@ -27,8 +31,8 @@ hotels = [
 def get_hotel(
     pagination: PaginationDep,
     id: int | None = Query(None, description="Уникальный id отеля"),
-    city: str | None = Query(None, description="Город"),
-    name: str | None = Query(None, description="Название отеля"),
+    location: str | None = Query(None, description="Город"),
+    title: str | None = Query(None, description="Название отеля"),
 ):
     all_hotels = []
 
@@ -38,9 +42,9 @@ def get_hotel(
     for hotel in hotels:
         if id and hotel["id"] != id:
             continue
-        elif city and hotel["city"] != city:
+        elif location and hotel["location"] != location:
             continue
-        elif name and hotel["name"] != name:
+        elif title and hotel["title"] != title:
             continue
         all_hotels.append(hotel)
     return all_hotels
@@ -51,26 +55,20 @@ def get_hotel(
     summary="Добавление данных об отеле",
     description="Позволяет добавить данные по новому отелю.",
 )
-def create_hotel(
-    hotel_data: Hotel = Body(
+async def create_hotel(
+    hotel_data: HotelPutPost = Body(
         openapi_examples={
             "1": {
                 "summary": "Санкт-Петербург",
-                "value": {"city": "Санкт-Петербург", "name": "Азимут"},
+                "value": {"location": "Санкт-Петербург", "title": "Азимут"},
             }
         }
     )
 ):
-    global hotels
-
-    if hotel_data.city != "string" and hotel_data.name != "string":
-        hotels.append(
-            {
-                "id": hotels[-1]["id"] + 1,
-                "city": hotel_data.city,
-                "name": hotel_data.name,
-            }
-        )
+    async with async_session_maker() as session:
+        add_hotel_stmt = insert(HotelOrm).values(**hotel_data.model_dump())
+        await session.execute(add_hotel_stmt)
+        await session.commit()
     return {"status": "OK"}
 
 
@@ -79,12 +77,12 @@ def create_hotel(
     summary="Полное обновление данных об отеле",
     description="Принимает существующий id отеля и обновляет данные только при изменения значений для всех полей",
 )
-def put_hotel(hotel_id: int, hotel_data: Hotel):
+def put_hotel(hotel_id: int, hotel_data: HotelPutPost):
     global hotels
 
     for hotel in hotels:
         if hotel["id"] == hotel_id:
-            hotel.update({"city": hotel_data.city, "hotel_name": hotel_data.name})
+            hotel.update({"location": hotel_data.location, "hotel_title": hotel_data.title})
             return {"status": "OK"}
     raise HTTPException(
         status_code=404, detail="The object with the entered 'hotel_id' is not found"
@@ -114,10 +112,10 @@ def patch_hotel(hotel_id: int, hotel_data: HotelPatch):
 
     for hotel in hotels:
         if hotel["id"] == hotel_id:
-            if hotel_data.city is not None:
-                hotel["city"] = hotel_data.city
-            if hotel_data.name is not None:
-                hotel["name"] = hotel_data.name
+            if hotel_data.location is not None:
+                hotel["location"] = hotel_data.location
+            if hotel_data.title is not None:
+                hotel["title"] = hotel_data.title
             return {"status": "OK"}
         raise HTTPException(
             status_code=404,
