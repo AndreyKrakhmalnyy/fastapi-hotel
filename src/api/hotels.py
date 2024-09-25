@@ -17,18 +17,19 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 )
 async def get_hotel(
     pagination: PaginationDep,
-    id: int | None = Query(None, description="Уникальный id отеля"),
     title: str | None = Query(None, description="Название отеля"),
+    location: str | None = Query(None, description="Город"),
 ):
     per_page = pagination.per_page or 5
 
     async with async_session_maker() as session:
         query = select(HotelsOrm)
 
-        if id:
-            query = query.filter_by(id=id)
         if title:
-            query = query.filter_by(title=title)
+            query = query.filter(HotelsOrm.title.ilike(f'%{title}%'))
+        if location:
+            query = query.filter(HotelsOrm.location.ilike(f'%{location}%'))
+            
         query = (
             query
             .limit(per_page)
@@ -38,7 +39,6 @@ async def get_hotel(
         result = await session.execute(query)
         hotels = result.scalars().all()
         return hotels
-
 
 @router.post(
     "",
@@ -50,8 +50,16 @@ async def create_hotel(
         openapi_examples={
             "1": {
                 "summary": "Санкт-Петербург",
-                "value": {"location": "Санкт-Петербург", "title": "Азимут"},
-            }
+                "value": {"location": "Санкт-Петербург", "title": "Azimut Resort"},
+            },
+            "2": {
+                "summary": "Геленджик",
+                "value": {"location": "Геленджик", "title": "Elean Family"},
+            },
+            "3": {
+                "summary": "Дубай",
+                "value": {"location": "Дубай", "title": "Dubai Family Bearitz"},
+            },
         }
     )
 ):
