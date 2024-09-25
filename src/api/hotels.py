@@ -1,3 +1,4 @@
+from re import I
 from fastapi import APIRouter, HTTPException, Query, Body
 from src.models.hotels import HotelsOrm
 from src.api.dependencies import PaginationDep
@@ -16,20 +17,29 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 )
 async def get_hotel(
     pagination: PaginationDep,
-    # id: int | None = Query(None, description="Уникальный id отеля"),
-    # location: str | None = Query(None, description="Город"),
-    # title: str | None = Query(None, description="Название отеля"),
+    id: int | None = Query(None, description="Уникальный id отеля"),
+    title: str | None = Query(None, description="Название отеля"),
 ):
+    per_page = pagination.per_page or 5
 
     async with async_session_maker() as session:
         query = select(HotelsOrm)
+
+        if id:
+            query = query.filter_by(id=id)
+        if title:
+            query = query.filter_by(title=title)
+        query = (
+            query
+            .limit(per_page)
+            .offset(per_page * (pagination.page - 1))
+        )
+        
         result = await session.execute(query)
         hotels = result.scalars().all()
         return hotels
-        
-    # if pagination.per_page and pagination.page:
-    #     return hotels[(pagination.per_page * pagination.page) - pagination.per_page:pagination.per_page * pagination.page]
-    
+
+
 @router.post(
     "",
     summary="Добавление данных об отеле",
@@ -62,7 +72,9 @@ def put_hotel(hotel_id: int, hotel_data: HotelPutPost):
 
     for hotel in hotels:
         if hotel["id"] == hotel_id:
-            hotel.update({"location": hotel_data.location, "hotel_title": hotel_data.title})
+            hotel.update(
+                {"location": hotel_data.location, "hotel_title": hotel_data.title}
+            )
             return {"status": "OK"}
     raise HTTPException(
         status_code=404, detail="The object with the entered 'hotel_id' is not found"
