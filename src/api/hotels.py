@@ -21,9 +21,13 @@ async def get_hotel(
     location: str | None = Query(None, description="Город"),
 ):
     per_page = pagination.per_page or 5
-
     async with async_session_maker() as session:
-        return await HotelsRepository(session).get_all()
+        return await HotelsRepository(session).get_all(
+            location=location,
+            title=title,
+            limit=per_page,
+            offset=per_page * (pagination.page - 1),
+        )
 
 
 @router.post(
