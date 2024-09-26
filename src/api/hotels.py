@@ -1,10 +1,8 @@
 from repositories.hotels import HotelsRepository
 from fastapi import APIRouter, HTTPException, Query, Body
-from src.models.hotels import HotelsOrm
 from src.api.dependencies import PaginationDep
-from src.schemas.hotels import HotelPutPost, HotelPatch
+from src.schemas.hotels import HotelsPutPost, HotelsPatch
 from src.database import async_session_maker
-from sqlalchemy import insert
 
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -36,7 +34,7 @@ async def get_hotel(
     description="Позволяет добавить данные по новому отелю.",
 )
 async def create_hotel(
-    hotel_data: HotelPutPost = Body(
+    hotel_data: HotelsPutPost = Body(
         openapi_examples={
             "1": {
                 "summary": "Санкт-Петербург",
@@ -53,11 +51,10 @@ async def create_hotel(
         }
     )
 ):
-    async with async_session_maker() as session:
-        add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
-        await session.execute(add_hotel_stmt)
+    async with async_session_maker() as session: 
+        hotel = await HotelsRepository(session).add_one(title=hotel_data.title, location=hotel_data.location)
         await session.commit()
-    return {"status": "OK"}
+    return {"status": "OK", "data": hotel}
 
 
 @router.put(
@@ -65,7 +62,7 @@ async def create_hotel(
     summary="Полное обновление данных об отеле",
     description="Принимает существующий id отеля и обновляет данные только при изменения значений для всех полей",
 )
-def put_hotel(hotel_id: int, hotel_data: HotelPutPost):
+def put_hotel(hotel_id: int, hotel_data: HotelsPutPost):
     global hotels
 
     for hotel in hotels:
@@ -97,7 +94,7 @@ def delete_hotel(hotel_id: int):
     summary="Частичное обновление данных об отеле",
     description="Принимает существующий id отеля и позволяет изменять данные только по нужным полям.",
 )
-def patch_hotel(hotel_id: int, hotel_data: HotelPatch):
+def patch_hotel(hotel_id: int, hotel_data: HotelsPatch):
     global hotels
 
     for hotel in hotels:
