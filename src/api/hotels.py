@@ -51,10 +51,33 @@ async def create_hotel(
         }
     )
 ):
-    async with async_session_maker() as session: 
+    async with async_session_maker() as session:
         hotel = await HotelsRepository(session).add_one(hotel_data)
         await session.commit()
     return {"status": "OK", "data": hotel}
+
+
+@router.patch(
+    "/{hotel_id}",
+    summary="Частичное обновление данных об отеле",
+    description="Принимает существующий id отеля как обязательный параметр и позволяет изменять данные только по нужным полям.",
+)
+async def patch_hotel(hotel_id: int, hotel_data: HotelsPatch):
+    async with async_session_maker() as session:
+        hotel = await HotelsRepository(session).edit_partialy(hotel_data, id=hotel_id)
+        await session.commit()
+    return {"status": "OK", "data": hotel}
+
+
+@router.delete(
+    "/{hotel_id}",
+    summary="Удаление данных об отеле по его id",
+)
+async def delete_hotel(hotel_id: int):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).delete_by_id(id=hotel_id)
+        await session.commit()
+    return {"status": "OK"}
 
 
 @router.put(
@@ -74,37 +97,3 @@ def put_hotel(hotel_id: int, hotel_data: HotelsPutPost):
     raise HTTPException(
         status_code=404, detail="The object with the entered 'hotel_id' is not found"
     )  # Возбудить исключение если введённый hotel_id не существует
-
-
-@router.delete("/{hotel_id}", summary="Удаление данных об отеле")
-def delete_hotel(hotel_id: int):
-    global hotels
-
-    for hotel in hotels:
-        if hotel["id"] == hotel_id:
-            hotels.remove(hotel)
-            return {"status": "200 OK"}
-    raise HTTPException(
-        status_code=404, detail="The object with the entered 'hotel_id' is not found"
-    )  # Возбудить исключение если введённый hotel_id не существует
-
-
-@router.patch(
-    "/{hotel_id}",
-    summary="Частичное обновление данных об отеле",
-    description="Принимает существующий id отеля и позволяет изменять данные только по нужным полям.",
-)
-def patch_hotel(hotel_id: int, hotel_data: HotelsPatch):
-    global hotels
-
-    for hotel in hotels:
-        if hotel["id"] == hotel_id:
-            if hotel_data.location is not None:
-                hotel["location"] = hotel_data.location
-            if hotel_data.title is not None:
-                hotel["title"] = hotel_data.title
-            return {"status": "OK"}
-        raise HTTPException(
-            status_code=404,
-            detail="The object with the entered 'hotel_id' is not found",
-        )  # Возбудить исключение если введённый hotel_id не существует
