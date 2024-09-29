@@ -8,7 +8,7 @@ class BaseRepository:
     def __init__(self, session) -> None:
         self.session = session
 
-    async def get_all(self, *args, **kwargs):
+    async def get_full(self, *args, **kwargs):
         query = select(self.model)
         result = await self.session.execute(query)
         return result.scalars().all()
@@ -24,11 +24,21 @@ class BaseRepository:
         print(query.compile(compile_kwargs={"literal_binds": True}))
         return result.scalar()
 
-    async def edit_partialy(self, data: BaseModel, **filter_by):
+    async def edit_full(self, data: BaseModel, **filter_by):
         query = (
             update(self.model)
             .filter_by(**filter_by)
             .values(**data.model_dump())
+            .returning(self.model)
+        )
+        result = await self.session.execute(query)
+        return result.scalar()
+    
+    async def edit_partialy(self, data: BaseModel, exclude_unset: bool = False, **filter_by):
+        query = (
+            update(self.model)
+            .filter_by(**filter_by)
+            .values(**data.model_dump(exclude_unset=exclude_unset))
             .returning(self.model)
         )
         result = await self.session.execute(query)
