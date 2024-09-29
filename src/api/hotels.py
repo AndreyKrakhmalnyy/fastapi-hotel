@@ -10,22 +10,28 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 
 @router.get(
     "",
-    summary="Получение данных об отеле",
-    description="Позволяет получить список всех отелей, либо конкретный по id.",
+    summary="Получение данных о всех отелях",
 )
-async def get_hotel(
+async def get_hotels(
     pagination: PaginationDep,
     title: str | None = Query(None, description="Название отеля"),
     location: str | None = Query(None, description="Город"),
 ):
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
-        return await HotelsRepository(session).get_full(
+        return await HotelsRepository(session).get_all(
             location=location,
             title=title,
             limit=per_page,
             offset=per_page * (pagination.page - 1),
         )
+
+
+@router.get("{hotel_id}", summary="Получение данных о конкретном отеле по его id")
+async def get_hotel(hotel_id: int):
+    async with async_session_maker() as session:
+        hotel = await HotelsRepository(session).get_by_id(id=hotel_id)
+        return {"status": "OK", "data": hotel}
 
 
 @router.post(
@@ -56,6 +62,7 @@ async def post_hotel(
         await session.commit()
     return {"status": "OK", "data": hotel}
 
+
 @router.put(
     "/{hotel_id}",
     summary="Полное обновление данных об отеле",
@@ -67,6 +74,7 @@ async def put_hotel(hotel_id: int, hotel_data: HotelsPutPost):
         await session.commit()
     return {"status": "OK", "data": hotel}
 
+
 @router.patch(
     "/{hotel_id}",
     summary="Частичное обновление данных об отеле",
@@ -74,9 +82,12 @@ async def put_hotel(hotel_id: int, hotel_data: HotelsPutPost):
 )
 async def patch_hotel(hotel_id: int, hotel_data: HotelsPatch):
     async with async_session_maker() as session:
-        hotel = await HotelsRepository(session).edit_partialy(hotel_data, exclude_unset=True, id=hotel_id)
+        hotel = await HotelsRepository(session).edit_partialy(
+            hotel_data, exclude_unset=True, id=hotel_id
+        )
         await session.commit()
         return {"status": "OK", "data": hotel}
+
 
 @router.delete(
     "/{hotel_id}",
