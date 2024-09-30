@@ -1,12 +1,14 @@
-from sqlalchemy import func, select, delete
+from sqlalchemy import func, select
+from schemas.hotels import Hotel
 from src.models.hotels import HotelsOrm
 from src.repositories.base import BaseRepository
 
 
 class HotelsRepository(BaseRepository):
     model = HotelsOrm
+    schema = Hotel
 
-    async def get_all(self, location, title, limit, offset):
+    async def get_alll(self, location, title, limit, offset):
         query = select(HotelsOrm)
 
         if location:
@@ -19,4 +21,7 @@ class HotelsRepository(BaseRepository):
             )
         query = query.limit(limit).offset(offset)
         result = await self.session.execute(query)
-        return result.scalars().all()
+        return [
+            Hotel.model_validate(model, from_attributes=True)
+            for model in result.scalars().all()
+        ]

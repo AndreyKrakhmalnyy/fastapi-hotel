@@ -1,7 +1,7 @@
 from repositories.hotels import HotelsRepository
 from fastapi import APIRouter, Query, Body
 from src.api.dependencies import PaginationDep
-from src.schemas.hotels import HotelsPutPost, HotelsPatch
+from src.schemas.hotels import HotelAdd, HotelPatch
 from src.database import async_session_maker
 
 
@@ -40,7 +40,7 @@ async def get_hotel(hotel_id: int):
     description="Позволяет добавить данные по новому отелю.",
 )
 async def post_hotel(
-    hotel_data: HotelsPutPost = Body(
+    hotel_data: HotelAdd = Body(
         openapi_examples={
             "1": {
                 "summary": "Санкт-Петербург",
@@ -68,7 +68,7 @@ async def post_hotel(
     summary="Полное обновление данных об отеле",
     description="Принимает существующий id отеля и обновляет данные только при изменения значений для всех полей.",
 )
-async def put_hotel(hotel_id: int, hotel_data: HotelsPutPost):
+async def put_hotel(hotel_id: int, hotel_data: HotelAdd):
     async with async_session_maker() as session:
         hotel = await HotelsRepository(session).edit_full(hotel_data, id=hotel_id)
         await session.commit()
@@ -80,7 +80,7 @@ async def put_hotel(hotel_id: int, hotel_data: HotelsPutPost):
     summary="Частичное обновление данных об отеле",
     description="Принимает существующий id отеля как обязательный параметр и позволяет изменять данные только по нужным полям.",
 )
-async def patch_hotel(hotel_id: int, hotel_data: HotelsPatch):
+async def patch_hotel(hotel_id: int, hotel_data: HotelPatch):
     async with async_session_maker() as session:
         hotel = await HotelsRepository(session).edit_partialy(
             hotel_data, exclude_unset=True, id=hotel_id
