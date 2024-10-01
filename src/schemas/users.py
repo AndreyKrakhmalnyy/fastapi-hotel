@@ -13,3 +13,6 @@ class UserAdd(BaseModel):
 class User(BaseModel):
     id: int
     email: EmailStr = Field(description="Электронная почта")
+ 
+class UserWithHashedPassword(User):
+    hashed_password: str = Field(description="Зашифрованный пароль пользователя")
