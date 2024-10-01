@@ -1,4 +1,4 @@
-from schemas.users import User
+from src.schemas.users import User
 from src.models.users import UsersOrm
 from src.repositories.base import BaseRepository
 
