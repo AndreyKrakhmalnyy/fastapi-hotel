@@ -7,6 +7,11 @@ from src.schemas.users import UserAdd, UserRequestAdd
 
 router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 
+@router.get("/only_auth")
+async def only_auth(request: Request):
+    access_token = request.cookies.get('access_token', None)
+    return access_token
+
 @router.post("/register")
 async def register_user(
     user_data: UserRequestAdd = Body(
@@ -49,8 +54,3 @@ async def login_user(user_data: UserRequestAdd, response: Response):
         access_token = AuthService().create_access_token({"user_id": user.id})
         response.set_cookie("access_token", access_token)
         return {"access_token": access_token}
-
-@router.post("/only_auth")
-async def only_auth(request: Request):
-    access_token = request.cookies.get('access_token')
-    return {'access_token': access_token} if access_token else None
