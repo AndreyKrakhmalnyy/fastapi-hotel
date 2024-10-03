@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from fastapi import HTTPException
+from fastapi import HTTPException, Request, Response
 from passlib.context import CryptContext
 from src.config import settings
 import jwt
@@ -28,3 +28,8 @@ class AuthService:
             return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=settings.JWT_ALGORITHM)
         except jwt.exceptions.DecodeError:
             raise HTTPException(status_code=401, detail='Неверный токен доступа, проверьте его корректность')
+        
+    def logout_session(self, token, response: Response):
+        if token:
+            response.delete_cookie('access_token')
+        return {'status': 'OK'}

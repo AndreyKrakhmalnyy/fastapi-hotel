@@ -17,7 +17,10 @@ PaginationDep = Annotated[PaginationParams, Depends()]
 def get_token(request: Request) -> str:
     token = request.cookies.get("access_token", None)
     if not token:
-        raise HTTPException(status_code=401, detail='В доступе отказано, предоставьте токен доступа')
+        if request.method == 'GET':
+            raise HTTPException(status_code=401, detail='В доступе отказано, предоставьте токен доступа')
+        elif request.method == 'POST':
+            raise HTTPException(status_code=400, detail='Вы не авторизованы, выход из системы невозможен')
     return token
     
 def get_current_user_by_id(token: str = Depends(get_token)):
@@ -26,3 +29,4 @@ def get_current_user_by_id(token: str = Depends(get_token)):
     return user_id
 
 UserIdDep = Annotated[int, Depends(get_current_user_by_id)]
+UserTokenDep = Annotated[int, Depends(get_token)]
