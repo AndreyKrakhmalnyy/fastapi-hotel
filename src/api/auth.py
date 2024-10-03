@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, HTTPException, Request, Response
+from fastapi import APIRouter, Body, HTTPException, Response, Request
 from api.dependencies import UserIdDep
 from src.services.auth import AuthService
 from src.repositories.users import UsersRepository
@@ -14,6 +14,15 @@ async def get_me(user_id: UserIdDep):
     async with async_session_maker() as session:
         user = await UsersRepository(session).get_one_or_none(id=user_id)
         return user
+
+@router.post("/logout")
+async def logout_user(response: Response, request: Request):
+    token = request.cookies.get("access_token", None)
+    if not token:
+        raise HTTPException(status_code=400, detail='Вы не авторизованы, выход из системы невозможен')
+    response.delete_cookie('access_token')
+    return {'status': 'OK'}
+
 
 @router.post("/register")
 async def register_user(
