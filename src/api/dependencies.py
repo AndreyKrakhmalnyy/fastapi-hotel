@@ -1,8 +1,9 @@
 from fastapi import Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from typing import Annotated
-
+from src.database import async_session_maker
 from services.auth import AuthService
+from src.utils.db_manager import DBManager
 
 
 class PaginationParams(BaseModel):
@@ -13,20 +14,36 @@ class PaginationParams(BaseModel):
 
 
 PaginationDep = Annotated[PaginationParams, Depends()]
-    
+
+
 def get_token(request: Request) -> str:
     token = request.cookies.get("access_token", None)
     if not token:
-        if request.method == 'GET':
-            raise HTTPException(status_code=401, detail='В доступе отказано, предоставьте токен доступа')
-        elif request.method == 'POST':
-            raise HTTPException(status_code=400, detail='Вы не авторизованы, выход из системы невозможен')
+        if request.method == "GET":
+            raise HTTPException(
+                status_code=401, detail="В доступе отказано, предоставьте токен доступа"
+            )
+        elif request.method == "POST":
+            raise HTTPException(
+                status_code=400,
+                detail="Вы не авторизованы, выход из системы невозможен",
+            )
     return token
-    
+
+
 def get_current_user_by_id(token: str = Depends(get_token)):
     user_data = AuthService().decode_token(token)
-    user_id = user_data.get('user_id', None)
+    user_id = user_data.get("user_id", None)
     return user_id
+
 
 UserIdDep = Annotated[int, Depends(get_current_user_by_id)]
 UserTokenDep = Annotated[int, Depends(get_token)]
+
+
+async def get_db():
+    async with DBManager(session_factory=async_session_maker) as db:
+        yield db
+
+
+DBDep = Annotated[DBManager, Depends(get_db)]

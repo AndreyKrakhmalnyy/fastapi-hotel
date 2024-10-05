@@ -8,7 +8,7 @@ class HotelsRepository(BaseRepository):
     model = HotelsOrm
     schema = Hotel
 
-    async def get_alll(self, location, title, limit, offset):
+    async def get_all_hotels(self, location, title, limit, offset):
         query = select(HotelsOrm)
 
         if location:
@@ -25,3 +25,4 @@ class HotelsRepository(BaseRepository):
             Hotel.model_validate(model, from_attributes=True)
             for model in result.scalars().all()
         ]
+        
