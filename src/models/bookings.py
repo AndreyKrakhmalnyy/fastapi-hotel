@@ -1,7 +1,8 @@
 from datetime import date
-from src.database import Base
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import DateTime, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column
+from src.database import Base
 
 class BookingsOrm(Base):
     __tablename__ = 'bookings'
