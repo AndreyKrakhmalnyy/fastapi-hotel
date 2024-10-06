@@ -1,21 +1,19 @@
-from fastapi import APIRouter, Body, HTTPException, Response, Request
-from src.api.dependencies import UserIdDep, UserTokenDep
+from fastapi import APIRouter, Body, HTTPException, Response
+from src.api.dependencies import UserIdDep, UserTokenDep, DBDep
 from src.services.auth import AuthService
-from src.repositories.users import UsersRepository
-from src.database import async_session_maker
 from src.schemas.users import UserAdd, UserRequestAdd
 
 
 router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 
 @router.get("/me")
-async def get_me(user_id: UserIdDep):
-    async with async_session_maker() as session:
-        user = await UsersRepository(session).get_one_or_none(id=user_id)
+async def get_me(db: DBDep, user_id: UserIdDep):
+        user = await db.users.get_one_or_none(id=user_id)
         return user
 
 @router.post("/register")
 async def register_user(
+    db: DBDep, 
     user_data: UserRequestAdd = Body(
         openapi_examples={
             "1": {
@@ -35,16 +33,13 @@ async def register_user(
 ):
     hashed_password = AuthService().hash_password(user_data.password)
     new_user_data = UserAdd(email=user_data.email, hashed_password=hashed_password)
-    async with async_session_maker() as session:
-        await UsersRepository(session).add_one(new_user_data)
-        await session.commit()
-
+    await db.users.add_one(new_user_data)
+    await db.commit()
     return {"status": "OK"}
 
 @router.post("/login")
-async def login_user(user_data: UserRequestAdd, response: Response):
-    async with async_session_maker() as session:
-        user = await UsersRepository(session).get_user_with_hashed_password(
+async def login_user(db: DBDep, user_data: UserRequestAdd, response: Response):
+        user = await db.users.get_user_with_hashed_password(
             email=user_data.email
         )
         if not user:
