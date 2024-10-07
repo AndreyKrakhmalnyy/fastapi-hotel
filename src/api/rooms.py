@@ -12,7 +12,7 @@ router = APIRouter(prefix="/hotels", tags=["Номера"])
     summary="Получение списка всех номеров",
     description="Позволяет также фильтроваться по названию номера и цене за сутки.",
 )
-async def get_all_rooms(
+async def get_rooms(
     db: DBDep,
     title: str | None = Query(None, description="Название номера"),
     price: int | None = Query(None, description="Цена за сутки"),
