@@ -6,17 +6,14 @@ from src.schemas.users import UserAdd, UserRequestAdd
 
 router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 
-
 @router.get("/all")
 async def get_all_users(db: DBDep):
     return await db.users.get_all()
-
 
 @router.get("/me")
 async def get_user(db: DBDep, user_id: UserIdDep):
     user = await db.users.get_one_or_none(id=user_id)
     return user
-
 
 @router.post("/register")
 async def register_user(
