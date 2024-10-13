@@ -26,7 +26,6 @@ async def get_hotels(
         offset=per_page * (pagination.page - 1),
     )
 
-
 @router.get("/{hotel_id}", summary="Получение данных о конкретном отеле по его id")
 async def get_hotel(db: DBDep, hotel_id: int):
         hotel = await db.hotels.get_one_or_none(id=hotel_id)
