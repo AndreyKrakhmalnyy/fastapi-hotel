@@ -44,7 +44,6 @@ async def register_user(
     await db.commit()
     return {"status": "OK"}
 
-
 @router.post("/login")
 async def login_user(db: DBDep, user_data: UserRequestAdd, response: Response):
     user = await db.users.get_user_with_hashed_password(email=user_data.email)
@@ -57,7 +56,6 @@ async def login_user(db: DBDep, user_data: UserRequestAdd, response: Response):
     access_token = AuthService().create_access_token({"user_id": user.id})
     response.set_cookie("access_token", access_token)
     return {"access_token": access_token}
-
 
 @router.post("/logout")
 async def logout_user(token: UserTokenDep, response: Response):
