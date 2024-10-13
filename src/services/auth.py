@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from fastapi import HTTPException, Request, Response
+from fastapi import HTTPException, Response
 from passlib.context import CryptContext
 from src.config import settings
 import jwt
