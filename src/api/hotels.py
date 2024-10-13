@@ -26,7 +26,6 @@ async def get_hotels(
         offset=per_page * (pagination.page - 1),
     )
 
-
 @router.get("/{hotel_id}", summary="Получение данных о конкретном отеле по его id")
 async def get_hotel(db: DBDep, hotel_id: int):
         hotel = await db.hotels.get_one_or_none(id=hotel_id)
@@ -71,7 +70,6 @@ async def put_hotel(db: DBDep, hotel_id: int, hotel_data: HotelAdd):
         await db.commit()
         return {"status": "OK", "data": hotel}
 
-
 @router.patch(
     "/{hotel_id}",
     summary="Частичное обновление данных об отеле",
@@ -83,8 +81,7 @@ async def patch_hotel(db: DBDep, hotel_id: int, hotel_data: HotelPatch):
         )
         await db.commit()
         return {"status": "OK", "data": hotel}
-
-
+    
 @router.delete(
     "/{hotel_id}",
     summary="Удаление данных об отеле по его id",
