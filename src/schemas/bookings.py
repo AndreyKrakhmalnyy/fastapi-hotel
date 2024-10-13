@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
 from datetime import date
 
+
+
 class BookingRequestAdd(BaseModel):
     room_id: int
     date_from: date = Field(description='Дата начала бронирования')
