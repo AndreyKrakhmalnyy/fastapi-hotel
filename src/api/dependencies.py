@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from typing import Annotated
 from src.database import async_session_maker
-from services.auth import AuthService
+from src.services.auth import AuthService
 from src.utils.db_manager import DBManager
 
 
@@ -19,15 +19,9 @@ PaginationDep = Annotated[PaginationParams, Depends()]
 def get_token(request: Request) -> str:
     token = request.cookies.get("access_token", None)
     if not token:
-        # if request.method == "GET":
         raise HTTPException(
             status_code=401, detail="Вы не авторизованы, предоставьте токен доступа"
         )
-        # elif request.method == "POST":
-        #     raise HTTPException(
-        #         status_code=400,
-        #         detail="Вы не авторизованы",
-        #     )
     return token
 
 

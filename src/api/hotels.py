@@ -1,4 +1,4 @@
-from repositories.hotels import HotelsRepository
+# from src.repositories.hotels import HotelsRepository
 from fastapi import APIRouter, Query, Body
 from src.api.dependencies import DBDep, PaginationDep
 from src.schemas.hotels import HotelAdd, HotelPatch
