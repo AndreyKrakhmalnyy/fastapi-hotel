@@ -27,32 +27,36 @@ class RoomsRepository(BaseRepository):
 
     async def get_filtered_by_time(self, hotel_id: int, date_from: date, date_to: date):
 
-        cross_booked = (
-            select(BookingsOrm.room_id, func.count("*").label(name="rooms_cnt"))
+        cross_booked_cte = (
+            select(BookingsOrm.room_id, func.count("*").label(name="rooms_count"))
             .select_from(BookingsOrm)
             .filter(
                 BookingsOrm.date_from <= date_from,
                 BookingsOrm.date_to >= date_to,
             )
             .group_by(BookingsOrm.room_id)
-            .cte(name="cross_booked")
+            .cte(name="cross_booked_cte")
         )
 
-        free_rooms = (
+        free_rooms_join = (
             select(
                 RoomsOrm.id.label(name="room_id"),
                 (
-                    RoomsOrm.quantity - func.coalesce(cross_booked.c.rooms_booked_cnt)
-                ).label(name="free_rooms_cnt"),
+                    RoomsOrm.quantity - func.coalesce(cross_booked_cte.c.rooms_count, 0)
+                ).label(name="free_rooms_count"),
             )
             .select_from(RoomsOrm)
-            .join(cross_booked, cross_booked.c.room_id == RoomsOrm.id)
-            .cte(name="free_rooms")
+            .join(cross_booked_cte, cross_booked_cte.c.room_id == RoomsOrm.id)
+            .cte(name="free_rooms_join")
         )
 
+        room_ids_for_hotel = select(RoomsOrm.id).select_from(RoomsOrm).filter_by(hotel_id=hotel_id).subquery("rooms_of_hotel")
+
         query = (
-            select(free_rooms)
-            .select_from(free_rooms)
-            .filter(free_rooms.c.free_rooms_cnt > 0)
+            select(free_rooms_join)
+            .select_from(free_rooms_join)
+            .filter(free_rooms_join.c.free_rooms_count > 0,
+                    #free_rooms.c.room_id.in_(room_ids_for_hotel)
+            )
         )
         print(query.compile(compile_kwargs={"literal_binds": True}))

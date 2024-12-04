@@ -18,8 +18,10 @@ async def get_rooms(
 ):
         return await db.rooms.get_rooms_filters(title=title, price=price)
     
-@router.get("/{hotel_id}/rooms", summary="Получение данных о всех номерах конкретного отеля")
-async def get_rooms_of_hotel(
+@router.get(
+    "/{hotel_id}/rooms", 
+    summary="Получение свободных номеров по дате заезда и выезда")
+async def get_free_rooms_by_date(
     db: DBDep, 
     hotel_id: int,
     date_from: date = Query(example='2024-10-05'),

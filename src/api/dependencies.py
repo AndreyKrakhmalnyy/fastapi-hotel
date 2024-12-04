@@ -41,3 +41,8 @@ async def get_db():
 
 
 DBDep = Annotated[DBManager, Depends(get_db)]
+
+
+
+json_string = '{"description": "Adobe Reader", "wine_version": "8.0.1", "program_name": "Adobe Reader", "categories": "Office", "soft_version": "11.0.08", "vendor": "Adobe Systems", "wine_config": ["config1", "config2"], "wine_install": "install1,install2", "wine_packages": ["package1", "package2"]}'
+print(json.loads(json_string))
