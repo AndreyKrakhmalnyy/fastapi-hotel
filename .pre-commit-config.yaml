@@ -11,6 +11,14 @@ repos:
       stages: [pre-commit]
       args: [--line-length=70, --target-version=py311]
 
+    - id: autopep8
+      name: autopep8
+      entry: poetry run autopep8
+      language: system
+      types: [python]
+      stages: [pre-commit]
+      args: [--in-place, --max-line-length=79] 
+
     - id: autoflake
       name: autoflake
       entry: poetry run autoflake
@@ -18,14 +26,6 @@ repos:
       types: [python]
       stages: [pre-commit]
       args: [--in-place, --remove-all-unused-imports, --remove-unused-variables,  --remove-duplicate-keys]
-
-    # - id: flake8
-    #   name: flake8
-    #   entry: poetry run flake8
-    #   language: system
-    #   types: [python]
-    #   stages: [pre-push]
-    #   args: ["--ignore=W191,E12"]
 
     - id: pyupgrade
       name: pyupgrade
@@ -41,18 +41,4 @@ repos:
       language: system
       stages: [pre-push]
       types: [python]
-
-    # - id: mypy
-    #   name: mypy
-    #   entry: poetry run mypy
-    #   language: system
-    #   stages: [pre-push]
-    #   types: [python]
-    
-    # - id: pylint
-    #   name: pylint
-    #   entry: poetry run pylint
-    #   language: system
-    #   stages: [pre-push]
-    #   types: [python]
-    #   args: ["--max-line-length=120"]  
+  
