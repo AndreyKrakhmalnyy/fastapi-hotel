@@ -32,7 +32,9 @@ def upgrade() -> None:
         "users",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("email", sa.String(length=100), nullable=False),
-        sa.Column("hashed_password", sa.String(length=100), nullable=False),
+        sa.Column(
+            "hashed_password", sa.String(length=100), nullable=False
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
     )
@@ -41,7 +43,9 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("hotel_id", sa.Integer(), nullable=False),
         sa.Column("title", sa.String(length=50), nullable=False),
-        sa.Column("description", sa.String(length=100), nullable=True),
+        sa.Column(
+            "description", sa.String(length=100), nullable=True
+        ),
         sa.Column("price", sa.Integer(), nullable=False),
         sa.Column("quantity", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
@@ -59,7 +63,10 @@ def upgrade() -> None:
         sa.Column("date_to", sa.DateTime(), nullable=False),
         sa.Column("price", sa.Integer(), nullable=False),
         sa.Column(
-            "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+            "created_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.ForeignKeyConstraint(
             ["room_id"],

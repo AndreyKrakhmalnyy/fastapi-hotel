@@ -11,12 +11,13 @@ class BaseRepository:
 
     async def get_filtered(self, *filter, **filter_by):
         query = (
-            select(self.model)
-            .filter(*filter)
-            .filter_by(**filter_by)
+            select(self.model).filter(*filter).filter_by(**filter_by)
         )
         result = await self.session.execute(query)
-        return [self.schema.model_validate(model) for model in result.scalars().all()]
+        return [
+            self.schema.model_validate(model)
+            for model in result.scalars().all()
+        ]
 
     async def get_all(self, *args, **kwargs):
         return await self.get_filtered()
@@ -29,11 +30,17 @@ class BaseRepository:
         return (
             None
             if model is None
-            else self.schema.model_validate(model, from_attributes=True)
+            else self.schema.model_validate(
+                model, from_attributes=True
+            )
         )
 
     async def add_one(self, data: BaseModel):
-        query = insert(self.model).values(**data.model_dump()).returning(self.model)
+        query = (
+            insert(self.model)
+            .values(**data.model_dump())
+            .returning(self.model)
+        )
         result = await self.session.execute(query)
         print(query.compile(compile_kwargs={"literal_binds": True}))
         model = result.scalars().one()
@@ -51,7 +58,10 @@ class BaseRepository:
         return self.schema.model_validate(model, from_attributes=True)
 
     async def edit_partialy(
-        self, data: BaseModel, exclude_unset: bool = False, **filter_by
+        self,
+        data: BaseModel,
+        exclude_unset: bool = False,
+        **filter_by,
     ):
         query = (
             update(self.model)

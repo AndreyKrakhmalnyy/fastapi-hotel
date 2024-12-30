@@ -8,9 +8,13 @@ from app.utils.db_manager import DBManager
 
 class PaginationParams(BaseModel):
     per_page: Annotated[
-        int | None, Query(None, description="Число отелей на странице", ge=1)
+        int | None,
+        Query(None, description="Число отелей на странице", ge=1),
     ]
-    page: Annotated[int | None, Query(1, description="Номер страницы", ge=1, lt=30)]
+    page: Annotated[
+        int | None,
+        Query(1, description="Номер страницы", ge=1, lt=30),
+    ]
 
 
 PaginationDep = Annotated[PaginationParams, Depends()]
@@ -20,7 +24,8 @@ def get_token(request: Request) -> str:
     token = request.cookies.get("access_token", None)
     if not token:
         raise HTTPException(
-            status_code=401, detail="Вы не авторизованы, предоставьте токен доступа"
+            status_code=401,
+            detail="Вы не авторизованы, предоставьте токен доступа",
         )
     return token
 

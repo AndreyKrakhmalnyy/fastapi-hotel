@@ -15,7 +15,9 @@ class RoomsRepository(BaseRepository):
 
         if title:
             query = query.filter(
-                func.lower(RoomsOrm.title).contains(f"%{title.strip().lower()}%")
+                func.lower(RoomsOrm.title).contains(
+                    f"%{title.strip().lower()}%"
+                )
             )
         if price:
             query = query.where(RoomsOrm.price == price)
@@ -26,10 +28,14 @@ class RoomsRepository(BaseRepository):
         ]
 
     async def get_filtered_by_time(
-            self,
-            hotel_id,
-            date_from: date,
-            date_to: date,
+        self,
+        hotel_id,
+        date_from: date,
+        date_to: date,
     ):
-        rooms_ids_to_get = rooms_ids_for_booking(date_from, date_to, hotel_id)
-        return await self.get_filtered(RoomsOrm.id.in_(rooms_ids_to_get))
+        rooms_ids_to_get = rooms_ids_for_booking(
+            date_from, date_to, hotel_id
+        )
+        return await self.get_filtered(
+            RoomsOrm.id.in_(rooms_ids_to_get)
+        )
