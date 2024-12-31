@@ -1,5 +1,6 @@
 from datetime import date
 from fastapi import APIRouter, Body, Query
+from app.schemas.facilities import RoomFacilityIn
 from app.schemas.rooms import (
     RoomAdd,
     RoomAddRequest,
@@ -59,40 +60,16 @@ async def get_room_of_hotel(db: DBDep, hotel_id: int, room_id: int):
 async def post_room(
     db: DBDep,
     hotel_id: int,
-    room_data: RoomAddRequest = Body(
-        openapi_examples={
-            "Санкт-Петербург": {
-                "summary": "Azimut Resort",
-                "value": {
-                    "title": "Одноместный Luxury",
-                    "description": "Люкс-номер для одного человека с одним спальным местом.",
-                    "price": 10000,
-                    "quantity": 15,
-                },
-            },
-            "Геленджик": {
-                "summary": "Elean Family",
-                "value": {
-                    "title": "Двухместный Deluxe",
-                    "description": "Супер люкс-номер для двух человек с двумя спальными местами с джакузи.",
-                    "price": 15000,
-                    "quantity": 10,
-                },
-            },
-            "Дубай": {
-                "summary": "Dubai Family Bearitz",
-                "value": {
-                    "title": "Трёхкомнатный президентский",
-                    "description": "Президентский люкс-номер для трёх человек с тремя спальными местами.",
-                    "price": 50000,
-                    "quantity": 5,
-                },
-            },
-        }
-    ),
+    room_data: RoomAddRequest = Body(),
 ):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     room = await db.rooms.add_one(_room_data)
+
+    rooms_ficilities_data = [
+        RoomFacilityIn(room_id=room.id, facility_id=f_id)
+        for f_id in room_data.facilities_ids
+    ]
+    await db.rooms_facilities.add_batch(rooms_ficilities_data)
     await db.commit()
     return {"status": "OK", "data": room}
 
