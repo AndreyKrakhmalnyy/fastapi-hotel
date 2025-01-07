@@ -1,13 +1,15 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.schemas.tools import partial_model
+
 
 class RoomAddRequest(BaseModel):
     title: str
     description: str | None = None
     price: int
     quantity: int
-    facilities_ids: Optional[List[int]] = None
+    facilities_ids: Optional[List[int]] = []
 
 
 class RoomAdd(BaseModel):
@@ -26,16 +28,18 @@ class Room(RoomAdd):
     model_config = ConfigDict(from_attributes=True)
 
 
+@partial_model
 class RoomPatchRequest(BaseModel):
-    title: str | None = None
-    description: str | None = None
-    price: int | None = None
-    quantity: int | None = None
+    title: str
+    description: str
+    price: int
+    quantity: int
+    facilities_ids: List[int] = []
 
 
 class RoomPatch(BaseModel):
-    hotel_id: int | None = None
-    title: str | None = None
-    description: str | None = None
-    price: int | None = None
-    quantity: int | None = None
+    hotel_id: int
+    title: str
+    description: str
+    price: int
+    quantity: int

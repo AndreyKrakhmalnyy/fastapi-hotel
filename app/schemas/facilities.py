@@ -1,7 +1,5 @@
 from pydantic import BaseModel, ConfigDict
 
-from app.schemas.tools import partial_model
-
 
 class FacilityIn(BaseModel):
     title: str
@@ -20,9 +18,3 @@ class RoomFacilityIn(BaseModel):
 
 class RoomFacilityOut(RoomFacilityIn):
     id: int
-
-
-@partial_model
-class RoomFacilityPartialUpdate(BaseModel):
-    room_id: int
-    facility_id: int

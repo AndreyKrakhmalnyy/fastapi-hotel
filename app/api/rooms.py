@@ -15,7 +15,6 @@ router = APIRouter(prefix="/hotels", tags=["Номера"])
 @router.get(
     "/{hotel_id}/rooms/all",
     summary="Получение списка всех номеров",
-    description="Позволяет также фильтроваться по названию номера и цене за сутки.",
 )
 async def get_rooms(
     db: DBDep,
@@ -55,7 +54,6 @@ async def get_room_of_hotel(db: DBDep, hotel_id: int, room_id: int):
 @router.post(
     "/{hotel_id}/rooms",
     summary="Добавление данных о номере в отель",
-    description="Позволяет добавить данные по новому номеру в конретный отель.",
 )
 async def post_room(
     db: DBDep,
@@ -77,23 +75,22 @@ async def post_room(
 @router.put(
     "/{hotel_id}/rooms/{room_id}",
     summary="Полное обновление данных о номере конкретного отеля",
-    description="Принимает существующий id отеля и номера как обязательные параметры и обновляет данные только при изменения значений для всех полей.",
 )
 async def put_room(
     db: DBDep, hotel_id: int, room_id: int, room_data: RoomAddRequest
 ):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
-    room = await db.rooms.edit_full(
-        _room_data, hotel_id=hotel_id, id=room_id
+    await db.rooms.edit_full(_room_data, id=room_id)
+    await db.rooms_facilities.set_room_facilities(
+        room_id, facilities_ids=room_data.facilities_ids
     )
     await db.commit()
-    return {"status": "OK", "data": room}
+    return {"status": "OK"}
 
 
 @router.patch(
     "/{hotel_id}/rooms/{room_id}",
     summary="Частичное обновление данных об номере отеля",
-    description="Принимает id отеля и номера как обязательные параметры и позволяет изменять данные только по нужным полям.",
 )
 async def patch_room(
     db: DBDep,
@@ -101,14 +98,17 @@ async def patch_room(
     room_id: int,
     room_data: RoomPatchRequest,
 ):
-    _room_data = RoomPatch(
-        hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True)
+    _room_data_dict = room_data.model_dump(exclude_unset=True)
+    _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
+    await db.rooms.edit_partialy(
+        _room_data, exclude_unset=True, id=room_id, hotel_id=hotel_id
     )
-    room = await db.rooms.edit_partialy(
-        _room_data, exclude_unset=True, hotel_id=hotel_id, id=room_id
-    )
+    if "facilities_ids" in _room_data_dict:
+        await db.rooms_facilities.set_room_facilities(
+            room_id, facilities_ids=_room_data_dict["facilities_ids"]
+        )
     await db.commit()
-    return {"status": "OK", "data": room}
+    return {"status": "OK"}
 
 
 @router.delete(
