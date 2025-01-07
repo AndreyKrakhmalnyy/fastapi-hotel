@@ -1,9 +1,10 @@
 from datetime import date
 from app.repositories.utils import rooms_ids_for_booking
-from app.schemas.rooms import Room
+from app.schemas.rooms import Room, RoomWithFacility
 from app.models.rooms import RoomsOrm
 from app.repositories.base import BaseRepository
 from sqlalchemy import func, select
+from sqlalchemy.orm import selectinload
 
 
 class RoomsRepository(BaseRepository):
@@ -39,3 +40,15 @@ class RoomsRepository(BaseRepository):
         return await self.get_filtered(
             RoomsOrm.id.in_(rooms_ids_to_get)
         )
+
+    async def get_one_or_none_with_rels(self, **filter_by):
+        query = (
+            select(self.model)
+            .options(selectinload(self.model.facilities))
+            .filter_by(**filter_by)
+        )
+        result = await self.session.execute(query)
+        model = result.scalars().one_or_none()
+        if not model:
+            return None
+        return RoomWithFacility.model_validate(model)

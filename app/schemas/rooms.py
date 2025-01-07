@@ -1,6 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.schemas.facilities import FacilityOut
 from app.schemas.tools import partial_model
 
 
@@ -26,6 +27,10 @@ class Room(RoomAdd):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class RoomWithFacility(Room):
+    facilities: List[FacilityOut]
 
 
 @partial_model

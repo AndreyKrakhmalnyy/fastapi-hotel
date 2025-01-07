@@ -1,8 +1,8 @@
-"""init commit
+"""initial commit
 
-Revision ID: f4ad830a2e72
+Revision ID: 87814c92ae51
 Revises: 
-Create Date: 2024-12-31 14:16:47.791599
+Create Date: 2025-01-07 13:18:53.826526
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "f4ad830a2e72"
+revision: str = "87814c92ae51"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -55,8 +55,7 @@ def upgrade() -> None:
         sa.Column("price", sa.Integer(), nullable=False),
         sa.Column("quantity", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["hotel_id"],
-            ["hotels.id"],
+            ["hotel_id"], ["hotels.id"], ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -75,12 +74,10 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.ForeignKeyConstraint(
-            ["room_id"],
-            ["rooms.id"],
+            ["room_id"], ["rooms.id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"],
-            ["users.id"],
+            ["user_id"], ["users.id"], ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("id"),
     )

@@ -45,7 +45,7 @@ async def get_free_rooms_by_date(
     summary="Получение данных о номере конкретного отеля",
 )
 async def get_room_of_hotel(db: DBDep, hotel_id: int, room_id: int):
-    room = await db.rooms.get_one_or_none(
+    room = await db.rooms.get_one_or_none_with_rels(
         id=room_id, hotel_id=hotel_id
     )
     return {"status": "OK", "data": room}

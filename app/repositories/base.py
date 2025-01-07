@@ -36,12 +36,12 @@ class BaseRepository:
         )
 
     async def add_one(self, data: BaseModel):
-        query = (
+        add_data_stmt = (
             insert(self.model)
             .values(**data.model_dump())
             .returning(self.model)
         )
-        result = await self.session.execute(query)
+        result = await self.session.execute(add_data_stmt)
         model = result.scalars().one()
         return self.schema.model_validate(model)
 
