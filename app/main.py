@@ -11,7 +11,7 @@ from fastapi import FastAPI
 sys.path.append(str(Path(__file__).parent.parent))
 
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 app.include_router(router_hotels)
 app.include_router(router_auth)
 app.include_router(router_rooms)
