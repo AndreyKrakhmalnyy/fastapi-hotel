@@ -8,7 +8,7 @@ class BookingRequestAdd(BaseModel):
     date_to: date = Field(description="Дата конца бронирования")
 
 
-class BookingAdd(BaseModel):
+class BookingIn(BaseModel):
     user_id: int
     room_id: int
     date_from: date = Field(description="Дата начала бронирования")
@@ -16,5 +16,5 @@ class BookingAdd(BaseModel):
     price: int = Field(description="Стоимость номера за сутки")
 
 
-class Booking(BookingAdd):
+class BookingOut(BookingIn):
     id: int

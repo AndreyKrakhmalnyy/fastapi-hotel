@@ -2,7 +2,7 @@ from datetime import date
 from sqlalchemy import func, select
 from app.models.rooms import RoomsOrm
 from app.repositories.mappers.base import DataMapper
-from app.repositories.mappers.hotels import HotelsDataMapper
+from app.repositories.mappers.mappers import HotelsDataMapper
 from app.repositories.utils import rooms_ids_for_booking
 from app.schemas.hotels import HotelOut
 from app.models.hotels import HotelsOrm
@@ -50,6 +50,6 @@ class HotelsRepository(BaseRepository):
         result = await self.session.execute(query)
 
         return [
-            self.mapper.api_model(hotel, from_attributes=True)
+            self.mapper.map_to_api_entity(hotel)
             for hotel in result.scalars().all()
         ]

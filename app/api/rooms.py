@@ -2,7 +2,7 @@ from datetime import date
 from fastapi import APIRouter, Body, Query
 from app.schemas.facilities import RoomFacilityIn
 from app.schemas.rooms import (
-    RoomAdd,
+    RoomIn,
     RoomAddRequest,
     RoomPatch,
     RoomPatchRequest,
@@ -60,7 +60,7 @@ async def post_room(
     hotel_id: int,
     room_data: RoomAddRequest = Body(),
 ):
-    _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
+    _room_data = RoomIn(hotel_id=hotel_id, **room_data.model_dump())
     room = await db.rooms.add_one(_room_data)
 
     rooms_ficilities_data = [
@@ -79,7 +79,7 @@ async def post_room(
 async def put_room(
     db: DBDep, hotel_id: int, room_id: int, room_data: RoomAddRequest
 ):
-    _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
+    _room_data = RoomIn(hotel_id=hotel_id, **room_data.model_dump())
     await db.rooms.edit_full(_room_data, id=room_id)
     await db.rooms_facilities.set_room_facilities(
         room_id, facilities_ids=room_data.facilities_ids

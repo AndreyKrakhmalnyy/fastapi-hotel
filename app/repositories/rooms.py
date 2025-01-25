@@ -1,6 +1,10 @@
 from datetime import date
+from app.repositories.mappers.base import DataMapper
+from app.repositories.mappers.mappers import (
+    RoomsDataMapper,
+    RoomsWithFacilitiesDataMapper,
+)
 from app.repositories.utils import rooms_ids_for_booking
-from app.schemas.rooms import Room, RoomWithFacility
 from app.models.rooms import RoomsOrm
 from app.repositories.base import BaseRepository
 from sqlalchemy import func, select
@@ -9,7 +13,7 @@ from sqlalchemy.orm import selectinload
 
 class RoomsRepository(BaseRepository):
     model = RoomsOrm
-    schema = Room
+    mapper: DataMapper = RoomsDataMapper
 
     async def get_rooms_filters(self, title, price):
         query = select(RoomsOrm)
@@ -24,7 +28,7 @@ class RoomsRepository(BaseRepository):
             query = query.where(RoomsOrm.price == price)
         result = await self.session.execute(query)
         return [
-            Room.model_validate(model, from_attributes=True)
+            self.mapper.map_to_api_entity(model)
             for model in result.scalars().all()
         ]
 
@@ -37,9 +41,16 @@ class RoomsRepository(BaseRepository):
         rooms_ids_to_get = rooms_ids_for_booking(
             date_from, date_to, hotel_id
         )
-        return await self.get_filtered(
-            RoomsOrm.id.in_(rooms_ids_to_get)
+        query = (
+            select(self.model)
+            .options(selectinload(self.model.facilities))
+            .filter(RoomsOrm.id.in_(rooms_ids_to_get))
         )
+        result = await self.session.execute(query)
+        return [
+            RoomsWithFacilitiesDataMapper.map_to_api_entity(model)
+            for model in result.unique().scalars().all()
+        ]
 
     async def get_one_or_none_with_rels(self, **filter_by):
         query = (
@@ -51,4 +62,4 @@ class RoomsRepository(BaseRepository):
         model = result.scalars().one_or_none()
         if not model:
             return None
-        return RoomWithFacility.model_validate(model)
+        return RoomsWithFacilitiesDataMapper.map_to_api_entity(model)

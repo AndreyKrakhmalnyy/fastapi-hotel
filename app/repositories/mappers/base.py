@@ -2,20 +2,20 @@ from typing import Type, TypeVar
 from pydantic import BaseModel
 from app.database import Base
 
-APIModel = TypeVar("APIModel", bound=BaseModel)
-DBModel = TypeVar("DBModel", bound=Base)
+APIModelType = TypeVar("APIModelType", bound=BaseModel)
+DBModelType = TypeVar("DBModelType", bound=Base)
 
 
 class DataMapper:
-    db_model = None
-    api_model = None
+    db_model: Type[DBModelType] = None
+    api_model: Type[APIModelType] = None
 
     @classmethod
-    def map_to_api_entity(cls, data) -> Type[APIModel]:
+    def map_to_api_entity(cls, data) -> APIModelType:
         return cls.api_model.model_validate(
             data, from_attributes=True
         )
 
     @classmethod
-    def map_to_db_entity(cls, data) -> Type[DBModel]:
+    def map_to_db_entity(cls, data) -> DBModelType:
         return cls.db_model(**data.model_dump())

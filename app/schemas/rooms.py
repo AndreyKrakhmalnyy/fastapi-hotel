@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 from app.schemas.facilities import FacilityOut
 from app.schemas.tools import partial_model
@@ -13,7 +13,7 @@ class RoomAddRequest(BaseModel):
     facilities_ids: Optional[List[int]] = []
 
 
-class RoomAdd(BaseModel):
+class RoomIn(BaseModel):
     hotel_id: int
     title: str = Field(description="Название номера")
     description: str | None = Field(
@@ -23,13 +23,11 @@ class RoomAdd(BaseModel):
     quantity: int = Field(description="Количество номеров отеля")
 
 
-class Room(RoomAdd):
+class RoomOut(RoomIn):
     id: int
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class RoomWithFacility(Room):
+class RoomWithFacilityOut(RoomOut):
     facilities: List[FacilityOut]
 
 
