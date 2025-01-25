@@ -1,15 +1,13 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 
-class HotelAdd(BaseModel):
+class HotelIn(BaseModel):
     location: str = Field(None, description="Город")
     title: str = Field(None, description="Название отеля")
 
 
-class Hotel(HotelAdd):
+class HotelOut(HotelIn):
     id: int
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class HotelPatch(BaseModel):

@@ -1,7 +1,7 @@
 from datetime import date
 from fastapi import APIRouter, Query, Body
 from app.api.dependencies import DBDep, PaginationDep
-from app.schemas.hotels import Hotel, HotelAdd, HotelPatch
+from app.schemas.hotels import HotelOut, HotelIn, HotelPatch
 
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -15,7 +15,7 @@ async def get_hotels_by_time(
     title: str | None = Query(None, description="Название отеля"),
     date_from: date = Query(example="2024-08-01"),
     date_to: date = Query(example="2024-08-10"),
-) -> list[Hotel]:
+) -> list[HotelOut]:
     per_page = pagination.per_page or 5
     return await db.hotels.get_filtered_by_time(
         date_from=date_from,
@@ -48,7 +48,7 @@ async def get_hotel(db: DBDep, hotel_id: int):
 )
 async def post_hotel(
     db: DBDep,
-    hotel_data: HotelAdd = Body(
+    hotel_data: HotelIn = Body(
         openapi_examples={
             "1": {
                 "summary": "Санкт-Петербург",
@@ -84,7 +84,7 @@ async def post_hotel(
     summary="Полное обновление данных об отеле",
     description="Принимает существующий id отеля и обновляет данные только при изменения значений для всех полей.",
 )
-async def put_hotel(db: DBDep, hotel_id: int, hotel_data: HotelAdd):
+async def put_hotel(db: DBDep, hotel_id: int, hotel_data: HotelIn):
     hotel = await db.hotels.edit_full(hotel_data, id=hotel_id)
     await db.commit()
     return {"status": "OK", "data": hotel}

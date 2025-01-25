@@ -1,10 +1,12 @@
 from pydantic import BaseModel
 from sqlalchemy import delete, insert, select, update
 
+from app.repositories.mappers.base import DataMapper
+
 
 class BaseRepository:
     model = None
-    schema = None
+    mapper: DataMapper = None
 
     def __init__(self, session) -> None:
         self.session = session
@@ -15,7 +17,7 @@ class BaseRepository:
         )
         result = await self.session.execute(query)
         return [
-            self.schema.model_validate(model)
+            self.mapper.map_to_api_entity(model)
             for model in result.scalars().all()
         ]
 
@@ -26,11 +28,11 @@ class BaseRepository:
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
         model = result.scalars().one_or_none()
-        print(query.compile(compile_kwargs={"literal_binds": True}))
+        # print(query.compile(compile_kwargs={"literal_binds": True}))
         return (
             None
             if model is None
-            else self.schema.model_validate(
+            else self.mapper.map_to_api_entity(
                 model, from_attributes=True
             )
         )
@@ -43,7 +45,7 @@ class BaseRepository:
         )
         result = await self.session.execute(add_data_stmt)
         model = result.scalars().one()
-        return self.schema.model_validate(model)
+        return self.mapper.map_to_api_entity(model)
 
     async def add_batch(self, data: list[BaseModel]):
         query = insert(self.model).values(
@@ -60,7 +62,9 @@ class BaseRepository:
         )
         result = await self.session.execute(query)
         model = result.scalar()
-        return self.schema.model_validate(model, from_attributes=True)
+        return self.mapper.map_to_api_entity(
+            model, from_attributes=True
+        )
 
     async def edit_partialy(
         self,
@@ -77,9 +81,10 @@ class BaseRepository:
         result = await self.session.execute(query)
         model = result.scalar()
         print(query.compile(compile_kwargs={"literal_binds": True}))
-        return self.schema.model_validate(model, from_attributes=True)
+        return self.mapper.map_to_api_entity(
+            model, from_attributes=True
+        )
 
     async def delete_by_id(self, **filter_by):
         query = delete(self.model).filter_by(**filter_by)
-        print(query.compile(compile_kwargs={"literal_binds": True}))
         await self.session.execute(query)
