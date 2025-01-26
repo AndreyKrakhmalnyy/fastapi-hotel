@@ -32,20 +32,6 @@ async def register_user(
                     "password": "abcdefg123",
                 },
             },
-            "2": {
-                "summary": "Андрей",
-                "value": {
-                    "email": "andrey10@mail.ru",
-                    "password": "afdsef34",
-                },
-            },
-            "3": {
-                "summary": "Виктория",
-                "value": {
-                    "email": "victoria10@mail.ru",
-                    "password": "wefwegr4@%264",
-                },
-            },
         }
     ),
 ):
