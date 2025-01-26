@@ -32,9 +32,7 @@ class BaseRepository:
         return (
             None
             if model is None
-            else self.mapper.map_to_api_entity(
-                model, from_attributes=True
-            )
+            else self.mapper.map_to_api_entity(model)
         )
 
     async def add_one(self, data: BaseModel):

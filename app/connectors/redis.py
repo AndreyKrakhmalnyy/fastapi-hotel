@@ -1,4 +1,3 @@
-from typing import Optional
 import redis.asyncio as redis
 
 
@@ -12,7 +11,7 @@ class RedisManager:
         """Устанавливает асинхронное подключение к redis"""
         self.redis = await redis.Redis(host=self.host, port=self.port)
 
-    async def set(self, key: str, value: int, expire: Optional[int]):
+    async def set(self, key: str, value: int, expire: int = None):
         """Устанавливает значение по ключу и времени хранения.
 
         Args:
