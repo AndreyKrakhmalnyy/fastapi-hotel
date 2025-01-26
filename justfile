@@ -1,3 +1,7 @@
+env:
+    poetry config virtualenvs.in-project true
+    poetry shell
+    
 install:
     poetry install --no-root --with formatters,linters,tests
     pre-commit install --hook-type pre-commit --hook-type pre-push
