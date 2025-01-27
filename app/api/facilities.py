@@ -1,10 +1,9 @@
-import json
 from fastapi import APIRouter, Body
 from app.api.dependencies import DBDep
 from app.schemas.facilities import (
     FacilityIn,
 )
-from app.redis_client import redis_manager
+from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
@@ -14,18 +13,10 @@ router = APIRouter(prefix="/facilities", tags=["Удобства"])
     summary="Получение данных о всех удобствах номера",
     description="Позволяет получить данные о удобствах в номере.",
 )
+@cache(expire=5)
 async def get_facilities(db: DBDep):
-    cached_facilities = await redis_manager.get("facilities")
-    if not cached_facilities:
-        print("DB")
-        db_facilities = await db.facilities.get_all()
-        schemas_facilities = [f.model_dump() for f in db_facilities]
-        await redis_manager.set(
-            "facilities", json.dumps(schemas_facilities), 5
-        )
-
-        return db_facilities
-    return json.loads(cached_facilities)
+    print("DB")
+    return await db.facilities.get_all()
 
 
 @router.get(
