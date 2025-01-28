@@ -1,3 +1,4 @@
+from app.redis_client import redis_manager
 import sys
 import uvicorn
 from pathlib import Path
@@ -6,7 +7,6 @@ from contextlib import asynccontextmanager
 
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from app.redis_client import redis_manager
 
 from app.api.facilities import router as facility_router
 from app.api.bookings import router as booking_router

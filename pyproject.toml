@@ -91,6 +91,7 @@ sqlalchemy = "^2.0.36"
 redis = "^5.2.1"
 fastapi-cache2 = "^0.2.2"
 celery = "^5.4.0"
+pillow = "^11.1.0"
 
 [tool.poetry.group.dev]
 optional = true
