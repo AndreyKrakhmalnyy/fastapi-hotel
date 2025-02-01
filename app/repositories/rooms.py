@@ -28,7 +28,7 @@ class RoomsRepository(BaseRepository):
             query = query.where(RoomsOrm.price == price)
         result = await self.session.execute(query)
         return [
-            self.mapper.map_to_api_entity(model)
+            self.mapper.map_to_domain_entity(model)
             for model in result.scalars().all()
         ]
 
@@ -48,7 +48,7 @@ class RoomsRepository(BaseRepository):
         )
         result = await self.session.execute(query)
         return [
-            RoomsWithFacilitiesDataMapper.map_to_api_entity(model)
+            RoomsWithFacilitiesDataMapper.map_to_domain_entity(model)
             for model in result.unique().scalars().all()
         ]
 
@@ -62,4 +62,6 @@ class RoomsRepository(BaseRepository):
         model = result.scalars().one_or_none()
         if not model:
             return None
-        return RoomsWithFacilitiesDataMapper.map_to_api_entity(model)
+        return RoomsWithFacilitiesDataMapper.map_to_domain_entity(
+            model
+        )

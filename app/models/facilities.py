@@ -1,10 +1,8 @@
-from typing import TYPE_CHECKING, List
+from typing import List
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
-
-if TYPE_CHECKING:
-    from app.models.rooms import RoomsOrm
+from app.models.rooms import RoomsOrm
 
 
 class FacilitiesOrm(Base):

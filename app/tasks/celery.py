@@ -8,3 +8,10 @@ celery_instance = Celery(
         "app.tasks.tasks",
     ],
 )
+
+celery_instance.conf.beat_schedule = {
+    "bookings_message": {
+        "task": "booking_today_alert",
+        "schedule": 5,
+    }
+}

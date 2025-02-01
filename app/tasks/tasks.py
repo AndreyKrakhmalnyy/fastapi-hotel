@@ -1,7 +1,10 @@
+import asyncio
 import os
 from PIL import Image
 from app.config import settings
 from app.tasks.celery import celery_instance
+from app.utils.db_manager import DBManager
+from app.database import async_session_maker_null_pool
 
 
 @celery_instance.task
@@ -29,3 +32,17 @@ def resize_image(image_path: str):
     print(
         f"Изображение сохранено в следующих размерах: {sizes} в папке {output_folder}"
     )
+
+
+async def get_bookings_today_db():
+    print("START")
+    async with DBManager(
+        session_factory=async_session_maker_null_pool
+    ) as db:
+        bookings = await db.bookings.get_today_bookings()
+        print(f"{bookings}=")
+
+
+@celery_instance.task(name="booking_today_alert")
+def send_emails_to_users():
+    asyncio.run(get_bookings_today_db())

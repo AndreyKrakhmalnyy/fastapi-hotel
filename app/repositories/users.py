@@ -17,4 +17,4 @@ class UsersRepository(BaseRepository):
         query = select(self.model).filter_by(email=email)
         result = await self.session.execute(query)
         model = result.scalars().one()
-        return self.mapper.map_to_api_entity(model)
+        return self.mapper.map_to_domain_entity(model)

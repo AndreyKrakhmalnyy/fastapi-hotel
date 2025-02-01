@@ -8,7 +8,7 @@ class BaseRepository:
     model = None
     mapper: DataMapper = None
 
-    def __init__(self, session) -> None:
+    def __init__(self, session):
         self.session = session
 
     async def get_filtered(self, *filter, **filter_by):
@@ -17,7 +17,7 @@ class BaseRepository:
         )
         result = await self.session.execute(query)
         return [
-            self.mapper.map_to_api_entity(model)
+            self.mapper.map_to_domain_entity(model)
             for model in result.scalars().all()
         ]
 
@@ -32,7 +32,7 @@ class BaseRepository:
         return (
             None
             if model is None
-            else self.mapper.map_to_api_entity(model)
+            else self.mapper.map_to_domain_entity(model)
         )
 
     async def add_one(self, data: BaseModel):
@@ -43,7 +43,7 @@ class BaseRepository:
         )
         result = await self.session.execute(add_data_stmt)
         model = result.scalars().one()
-        return self.mapper.map_to_api_entity(model)
+        return self.mapper.map_to_domain_entity(model)
 
     async def add_batch(self, data: list[BaseModel]):
         query = insert(self.model).values(
@@ -60,7 +60,7 @@ class BaseRepository:
         )
         result = await self.session.execute(query)
         model = result.scalar()
-        return self.mapper.map_to_api_entity(
+        return self.mapper.map_to_domain_entity(
             model, from_attributes=True
         )
 
@@ -79,7 +79,7 @@ class BaseRepository:
         result = await self.session.execute(query)
         model = result.scalar()
         print(query.compile(compile_kwargs={"literal_binds": True}))
-        return self.mapper.map_to_api_entity(
+        return self.mapper.map_to_domain_entity(
             model, from_attributes=True
         )
 
