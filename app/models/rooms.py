@@ -3,6 +3,8 @@ from app.database import Base
 from sqlalchemy import ForeignKey, String, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.models.facilities import FacilitiesOrm
+
 
 class RoomsOrm(Base):
     __tablename__ = "rooms"
