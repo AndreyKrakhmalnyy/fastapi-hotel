@@ -1,9 +1,7 @@
-from typing import List
+from typing import List, Optional
 from app.database import Base
 from sqlalchemy import ForeignKey, String, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.models.facilities import FacilitiesOrm
 
 
 class RoomsOrm(Base):
@@ -14,10 +12,10 @@ class RoomsOrm(Base):
         ForeignKey("hotels.id", ondelete="CASCADE")
     )
     title: Mapped[str] = mapped_column(String(50))
-    description: Mapped[str | None] = mapped_column(String(100))
+    description: Mapped[Optional[str]] = mapped_column(String(100))
     price: Mapped[int] = mapped_column(Integer)
     quantity: Mapped[int] = mapped_column(Integer)
-    facilities: Mapped[List["FacilitiesOrm"]] = relationship(
+    facilities: Mapped[List["FacilitiesOrm"]] = relationship(  # type: ignore
         back_populates="rooms",
         secondary="rooms_facilities",
     )

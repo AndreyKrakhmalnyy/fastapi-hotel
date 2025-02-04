@@ -8,7 +8,7 @@ from app.config import settings
 
 
 engine = create_async_engine(settings.DB_URL)
-# Пулл соединений с одним соединением (открывает и закрывает сессию) для запуска celery_beat
+# Пулл соединений, который не содержит соединений, а лишь открывает и закрывает сессию - для запуска celery_beat
 engine_null_pool = create_async_engine(
     settings.DB_URL, poolclass=NullPool
 )
