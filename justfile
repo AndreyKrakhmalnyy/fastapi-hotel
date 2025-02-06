@@ -1,11 +1,11 @@
-env:
+init venv:
     poetry config virtualenvs.in-project true
-    poetry shell
+    poetry install --no-root --with formatters,linters,tests 
+    source .venv/bin/activate
     
-install:
-    poetry install --no-root --with formatters,linters,tests
+install hooks:
     pre-commit install --hook-type pre-commit --hook-type pre-push
 
-send:
+run checks:
     pre-commit run --all-files --hook-stage pre-commit
     pre-commit run --all-files --hook-stage pre-push
