@@ -8,5 +8,5 @@ async def test_post_hotel():
         title="Test Hotel Title", location="Test Hotel Location"
     )
     async with DBManager(session_factory=async_session_maker) as db:
-        res = await db.hotels.add_one(hotel_data)
-        print(f"{res=}")
+        await db.hotels.add_one(hotel_data)
+        await db.commit()
