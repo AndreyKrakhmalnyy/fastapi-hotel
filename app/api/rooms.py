@@ -31,8 +31,8 @@ async def get_rooms(
 async def get_free_rooms_by_date(
     db: DBDep,
     hotel_id: int,
-    date_from: date = Query(example="2024-10-05"),
-    date_to: date = Query(example="2024-10-10"),
+    date_from: date = Query(examples="2024-10-05"),
+    date_to: date = Query(examples="2024-10-10"),
 ):
     room = await db.rooms.get_filtered_by_time(
         hotel_id=hotel_id, date_from=date_from, date_to=date_to
