@@ -1,13 +1,14 @@
 import json
 import aiofiles
 from pathlib import Path
-from httpx import AsyncClient
+from tests.conftest import api_client
+
 
 FIXTURES_DIR = Path(__file__).parent.parent / "json_fixtures"
 HOTELS_FIXTURE = FIXTURES_DIR / "hotels.json"
 
 
-async def test_add_hotels(api_client: AsyncClient):
+async def test_add_hotels(api_client: api_client):
     async with aiofiles.open(HOTELS_FIXTURE, "r") as f:
         content = await f.read()
         hotels = json.loads(content)

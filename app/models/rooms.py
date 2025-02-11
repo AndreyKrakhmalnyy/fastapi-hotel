@@ -15,7 +15,7 @@ class RoomsOrm(Base):
     description: Mapped[Optional[str]] = mapped_column(String(100))
     price: Mapped[int] = mapped_column(Integer)
     quantity: Mapped[int] = mapped_column(Integer)
-    facilities: Mapped[List["FacilitiesOrm"]] = relationship(  # type: ignore
+    facilities: Mapped[Optional[List["FacilitiesOrm"]]] = relationship(  # type: ignore
         back_populates="rooms",
         secondary="rooms_facilities",
     )
