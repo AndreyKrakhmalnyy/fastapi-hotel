@@ -95,6 +95,7 @@ pillow = "^11.1.0"
 pre-commit = "^4.1.0"
 pydantic-settings = "^2.7.1"
 aiofiles = "^24.1.0"
+ruff = "^0.9.6"
 
 [tool.poetry.group.dev]
 optional = false

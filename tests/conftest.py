@@ -8,7 +8,7 @@ from app.database import (
     engine_null_pool,
     async_session_maker_null_pool,
 )
-from app.models import *  # flake8: ignore
+from app.models import *  # noqa: F403
 from app.main import app
 from app.models.hotels import HotelsOrm
 from app.models.rooms import RoomsOrm
@@ -25,13 +25,13 @@ async def get_db_null_pool():
         yield db
 
 
-@pytest.fixture(scope="session")
-async def db_session() -> DBManager:
+@pytest.fixture(scope="function")
+async def db_session():
     async for db in get_db_null_pool():
         yield db
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 async def setup_db():
     async with engine_null_pool.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -67,7 +67,7 @@ async def api_client() -> AsyncGenerator:
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def register_user(api_client: api_client, setup_db: setup_db):
+async def register_user(api_client: api_client):
     await api_client.post(
         "/auth/register",
         json={"email": "kot@pes.com", "password": "1234"},

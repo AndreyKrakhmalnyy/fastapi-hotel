@@ -1,7 +1,10 @@
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 from app.database import Base
 from sqlalchemy import ForeignKey, String, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+if TYPE_CHECKING:
+    from app.models.facilities import FacilitiesOrm
 
 
 class RoomsOrm(Base):
@@ -15,7 +18,9 @@ class RoomsOrm(Base):
     description: Mapped[Optional[str]] = mapped_column(String(100))
     price: Mapped[int] = mapped_column(Integer)
     quantity: Mapped[int] = mapped_column(Integer)
-    facilities: Mapped[Optional[List["FacilitiesOrm"]]] = relationship(  # type: ignore
-        back_populates="rooms",
-        secondary="rooms_facilities",
+    facilities: Mapped[Optional[List["FacilitiesOrm"]]] = (
+        relationship(
+            back_populates="rooms",
+            secondary="rooms_facilities",
+        )
     )
