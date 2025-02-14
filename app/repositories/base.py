@@ -1,7 +1,8 @@
+from typing import List, Optional
 from pydantic import BaseModel
 from sqlalchemy import delete, insert, select, update
 
-from app.repositories.mappers.base import DataMapper
+from app.repositories.mappers.base import APIModelType, DataMapper
 
 
 class BaseRepository:
@@ -11,7 +12,9 @@ class BaseRepository:
     def __init__(self, session):
         self.session = session
 
-    async def get_filtered(self, *filter, **filter_by):
+    async def get_filtered(
+        self, *filter, **filter_by
+    ) -> List[APIModelType]:
         query = (
             select(self.model).filter(*filter).filter_by(**filter_by)
         )
@@ -21,21 +24,22 @@ class BaseRepository:
             for model in result.scalars().all()
         ]
 
-    async def get_all(self, *args, **kwargs):
+    async def get_all(self, *args, **kwargs) -> List[APIModelType]:
         return await self.get_filtered()
 
-    async def get_one_or_none(self, **filter_by):
+    async def get_one_or_none(
+        self, **filter_by
+    ) -> Optional[APIModelType]:
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
         model = result.scalars().one_or_none()
-        # print(query.compile(compile_kwargs={"literal_binds": True}))
         return (
             None
             if model is None
             else self.mapper.map_to_domain_entity(model)
         )
 
-    async def add_one(self, data: BaseModel):
+    async def add_one(self, data: BaseModel) -> APIModelType:
         add_data_stmt = (
             insert(self.model)
             .values(**data.model_dump())

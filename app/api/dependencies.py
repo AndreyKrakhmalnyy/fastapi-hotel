@@ -1,7 +1,10 @@
+from starlette import status
 from fastapi import Depends, HTTPException, Query, Request
+from jwt import ExpiredSignatureError
 from pydantic import BaseModel
 from typing import Annotated
 from app.database import async_session_maker
+from app.error import ServiceException
 from app.services.auth import AuthService
 from app.utils.db_manager import DBManager
 
@@ -31,9 +34,15 @@ def get_token(request: Request) -> str:
 
 
 def get_current_user_by_id(token: str = Depends(get_token)):
-    user_data = AuthService().decode_token(token)
-    user_id = user_data.get("user_id", None)
-    return user_id
+    try:
+        user_data = AuthService().decode_token(token)
+        user_id = user_data.get("user_id", None)
+        return user_id
+    except (ExpiredSignatureError, ServiceException):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Пользователь не найден, либо вы не авторизованы",
+        )
 
 
 UserIdDep = Annotated[int, Depends(get_current_user_by_id)]

@@ -11,7 +11,7 @@ class DataMapper:
     db_model: Type[DBModelType] = None
 
     @classmethod
-    def map_to_domain_entity(cls, data) -> APIModelType:
+    def map_to_domain_entity(cls, data):
         return cls.api_model.model_validate(
             data, from_attributes=True
         )
