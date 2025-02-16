@@ -35,9 +35,7 @@ async def get_facility(db: DBDep, facility_id: int):
     summary="Добавление данных об удобствах",
     description="Позволяет добавить данные об удобствах в номере.",
 )
-async def post_facility(
-    db: DBDep, facility_data: FacilityIn = Body()
-):
+async def post_facility(db: DBDep, facility_data: FacilityIn = Body()):
     facilities_data = await db.facilities.add_one(facility_data)
     await db.commit()
     return {"status": "OK", "data": facilities_data}

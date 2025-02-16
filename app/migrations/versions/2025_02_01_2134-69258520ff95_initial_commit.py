@@ -38,9 +38,7 @@ def upgrade() -> None:
         "users",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("email", sa.String(length=100), nullable=False),
-        sa.Column(
-            "hashed_password", sa.String(length=100), nullable=False
-        ),
+        sa.Column("hashed_password", sa.String(length=100), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
     )
@@ -49,14 +47,10 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("hotel_id", sa.Integer(), nullable=False),
         sa.Column("title", sa.String(length=50), nullable=False),
-        sa.Column(
-            "description", sa.String(length=100), nullable=True
-        ),
+        sa.Column("description", sa.String(length=100), nullable=True),
         sa.Column("price", sa.Integer(), nullable=False),
         sa.Column("quantity", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["hotel_id"], ["hotels.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["hotel_id"], ["hotels.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
@@ -73,12 +67,8 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
             nullable=False,
         ),
-        sa.ForeignKeyConstraint(
-            ["room_id"], ["rooms.id"], ondelete="CASCADE"
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_id"], ["users.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["room_id"], ["rooms.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
@@ -86,12 +76,8 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("room_id", sa.Integer(), nullable=False),
         sa.Column("facility_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["facility_id"], ["facilities.id"], ondelete="CASCADE"
-        ),
-        sa.ForeignKeyConstraint(
-            ["room_id"], ["rooms.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["facility_id"], ["facilities.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["room_id"], ["rooms.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     # ### end Alembic commands ###

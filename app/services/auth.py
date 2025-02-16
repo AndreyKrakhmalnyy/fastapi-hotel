@@ -10,12 +10,8 @@ from app.error import ServiceException
 class AuthService:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-    def verify_password(
-        self, plain_password, hashed_password
-    ) -> bool:
-        return self.pwd_context.verify(
-            plain_password, hashed_password
-        )
+    def verify_password(self, plain_password, hashed_password) -> bool:
+        return self.pwd_context.verify(plain_password, hashed_password)
 
     def create_access_token(self, data: dict) -> str:
         to_encode = data.copy()

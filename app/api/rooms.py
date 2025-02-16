@@ -45,9 +45,7 @@ async def get_free_rooms_by_date(
     summary="Получение данных о номере конкретного отеля",
 )
 async def get_room_of_hotel(db: DBDep, hotel_id: int, room_id: int):
-    room = await db.rooms.get_one_or_none_with_rels(
-        id=room_id, hotel_id=hotel_id
-    )
+    room = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
     return {"status": "OK", "data": room}
 
 
@@ -76,9 +74,7 @@ async def post_room(
     "/{hotel_id}/rooms/{room_id}",
     summary="Полное обновление данных о номере конкретного отеля",
 )
-async def put_room(
-    db: DBDep, hotel_id: int, room_id: int, room_data: RoomAddRequest
-):
+async def put_room(db: DBDep, hotel_id: int, room_id: int, room_data: RoomAddRequest):
     _room_data = RoomIn(hotel_id=hotel_id, **room_data.model_dump())
     await db.rooms.edit_full(_room_data, id=room_id)
     await db.rooms_facilities.set_room_facilities(

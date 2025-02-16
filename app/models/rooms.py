@@ -11,16 +11,12 @@ class RoomsOrm(Base):
     __tablename__ = "rooms"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    hotel_id: Mapped[int] = mapped_column(
-        ForeignKey("hotels.id", ondelete="CASCADE")
-    )
+    hotel_id: Mapped[int] = mapped_column(ForeignKey("hotels.id", ondelete="CASCADE"))
     title: Mapped[str] = mapped_column(String(50))
     description: Mapped[Optional[str]] = mapped_column(String(100))
     price: Mapped[int] = mapped_column(Integer)
     quantity: Mapped[int] = mapped_column(Integer)
-    facilities: Mapped[Optional[List["FacilitiesOrm"]]] = (
-        relationship(
-            back_populates="rooms",
-            secondary="rooms_facilities",
-        )
+    facilities: Mapped[Optional[List["FacilitiesOrm"]]] = relationship(
+        back_populates="rooms",
+        secondary="rooms_facilities",
     )

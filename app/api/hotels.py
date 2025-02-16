@@ -95,12 +95,8 @@ async def put_hotel(db: DBDep, hotel_id: int, hotel_data: HotelIn):
     summary="Частичное обновление данных об отеле",
     description="Принимает существующий id отеля как обязательный параметр и позволяет изменять данные только по нужным полям.",
 )
-async def patch_hotel(
-    db: DBDep, hotel_id: int, hotel_data: HotelPatch
-):
-    hotel = await db.hotels.edit_partialy(
-        hotel_data, exclude_unset=True, id=hotel_id
-    )
+async def patch_hotel(db: DBDep, hotel_id: int, hotel_data: HotelPatch):
+    hotel = await db.hotels.edit_partialy(hotel_data, exclude_unset=True, id=hotel_id)
     await db.commit()
     return {"status": "OK", "data": hotel}
 

@@ -12,47 +12,32 @@ class BaseRepository:
     def __init__(self, session):
         self.session = session
 
-    async def get_filtered(
-        self, *filter, **filter_by
-    ) -> List[APIModelType]:
-        query = (
-            select(self.model).filter(*filter).filter_by(**filter_by)
-        )
+    async def get_filtered(self, *filter, **filter_by) -> List[APIModelType]:
+        query = select(self.model).filter(*filter).filter_by(**filter_by)
         result = await self.session.execute(query)
         return [
-            self.mapper.map_to_domain_entity(model)
-            for model in result.scalars().all()
+            self.mapper.map_to_domain_entity(model) for model in result.scalars().all()
         ]
 
     async def get_all(self, *args, **kwargs) -> List[APIModelType]:
         return await self.get_filtered()
 
-    async def get_one_or_none(
-        self, **filter_by
-    ) -> Optional[APIModelType]:
+    async def get_one_or_none(self, **filter_by) -> Optional[APIModelType]:
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
         model = result.scalars().one_or_none()
-        return (
-            None
-            if model is None
-            else self.mapper.map_to_domain_entity(model)
-        )
+        return None if model is None else self.mapper.map_to_domain_entity(model)
 
     async def add_one(self, data: BaseModel) -> APIModelType:
         add_data_stmt = (
-            insert(self.model)
-            .values(**data.model_dump())
-            .returning(self.model)
+            insert(self.model).values(**data.model_dump()).returning(self.model)
         )
         result = await self.session.execute(add_data_stmt)
         model = result.scalars().one()
         return self.mapper.map_to_domain_entity(model)
 
     async def add_batch(self, data: list[BaseModel]):
-        query = insert(self.model).values(
-            [item.model_dump() for item in data]
-        )
+        query = insert(self.model).values([item.model_dump() for item in data])
         await self.session.execute(query)
 
     async def edit_full(self, data: BaseModel, **filter_by):
@@ -64,9 +49,7 @@ class BaseRepository:
         )
         result = await self.session.execute(query)
         model = result.scalar()
-        return self.mapper.map_to_domain_entity(
-            model, from_attributes=True
-        )
+        return self.mapper.map_to_domain_entity(model, from_attributes=True)
 
     async def edit_partialy(
         self,
@@ -83,9 +66,7 @@ class BaseRepository:
         result = await self.session.execute(query)
         model = result.scalar()
         print(query.compile(compile_kwargs={"literal_binds": True}))
-        return self.mapper.map_to_domain_entity(
-            model, from_attributes=True
-        )
+        return self.mapper.map_to_domain_entity(model, from_attributes=True)
 
     async def delete_by_id(self, **filter_by):
         query = delete(self.model).filter_by(**filter_by)

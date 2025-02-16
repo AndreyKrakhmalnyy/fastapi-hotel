@@ -8,9 +8,7 @@ class UserRequestAdd(BaseModel):
 
 class UserAdd(BaseModel):
     email: EmailStr = Field(description="Электронная почта")
-    hashed_password: str = Field(
-        description="Зашифрованный пароль пользователя"
-    )
+    hashed_password: str = Field(description="Зашифрованный пароль пользователя")
 
 
 class UserIn(BaseModel):
@@ -19,6 +17,4 @@ class UserIn(BaseModel):
 
 
 class UserOut(UserIn):
-    hashed_password: str = Field(
-        description="Зашифрованный пароль пользователя"
-    )
+    hashed_password: str = Field(description="Зашифрованный пароль пользователя")

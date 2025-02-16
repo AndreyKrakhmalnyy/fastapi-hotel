@@ -12,9 +12,7 @@ class DataMapper:
 
     @classmethod
     def map_to_domain_entity(cls, data):
-        return cls.api_model.model_validate(
-            data, from_attributes=True
-        )
+        return cls.api_model.model_validate(data, from_attributes=True)
 
     @classmethod
     def map_to_db_entity(cls, data) -> DBModelType:
