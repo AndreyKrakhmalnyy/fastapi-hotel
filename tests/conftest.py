@@ -19,9 +19,7 @@ from sqlalchemy.orm import Session
 
 
 async def get_db_null_pool():
-    async with DBManager(
-        session_factory=async_session_maker_null_pool
-    ) as db:
+    async with DBManager(session_factory=async_session_maker_null_pool) as db:
         yield db
 
 
@@ -37,21 +35,15 @@ async def setup_db():
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
-    with open(
-        "tests/json_fixtures/hotels.json", encoding="utf-8"
-    ) as hotels_json:
+    with open("tests/json_fixtures/hotels.json", encoding="utf-8") as hotels_json:
         hotels = json.load(hotels_json)
-    with open(
-        "tests/json_fixtures/rooms.json", encoding="utf-8"
-    ) as rooms_json:
+    with open("tests/json_fixtures/rooms.json", encoding="utf-8") as rooms_json:
         rooms = json.load(rooms_json)
 
     hotels = [HotelIn.model_validate(hotel) for hotel in hotels]
     rooms = [RoomIn.model_validate(room) for room in rooms]
 
-    async with DBManager(
-        session_factory=async_session_maker_null_pool
-    ) as db:
+    async with DBManager(session_factory=async_session_maker_null_pool) as db:
         await db.hotels.add_batch(hotels)
         await db.rooms.add_batch(rooms)
         await db.commit()
@@ -75,9 +67,7 @@ async def register_user(api_client: api_client):
 
 
 @pytest.fixture(scope="session")
-async def auth_api_client(
-    register_user: register_user, api_client: api_client
-):
+async def auth_api_client(register_user: register_user, api_client: api_client):
     await api_client.post(
         "/auth/login",
         json={"email": "kot@pes.com", "password": "1234"},
